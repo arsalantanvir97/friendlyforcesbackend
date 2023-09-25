@@ -77,6 +77,11 @@ exports.authUser = async (req, res) => {
         name: portalUserExists.name,
         email: portalUserExists.email,
         usertype: portalUserExists.usertype,
+        phone: portalUserExists.phone,
+        location: portalUserExists.location,
+        gender: portalUserExists.gender,
+        language: portalUserExists.language,
+        dob: portalUserExists.dob,
         token: generateJWTtoken(portalUserExists.id),
       })
     } else {
@@ -101,6 +106,172 @@ exports.getUserById = async (req, res) => {
 
     const user = await User1.getPortalUserById(id)
     res.json(user)
+  } catch (error) {
+    console.error('Error fetching user:', error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
+
+exports.editProfie = async (req, res) => {
+  try {
+    const { email, phone, location, gender, language, dob, id } = req.body
+
+    // const registerAdminPortalUser = await PortalUser.registerAdminPortalUser(name,email,password);
+    await User1.editUserbyID(email, phone, location, gender, language, dob, id)
+      .then((data) => {
+        console.log('Data: >>>>>', data)
+        return res.status(201).json({
+          success: true,
+          message: 'Portal User Updated Successfully...',
+          error: 'no error',
+        })
+      })
+      .catch((error) => {
+        console.log('Error: >>>>>', error.message)
+        return res.status(200).json({
+          success: false,
+          message: error.message,
+          error: error.message,
+        })
+      })
+  } catch (error) {
+    console.error('Error fetching user:', error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
+
+exports.updatepassword = async (req, res) => {
+  try {
+    const { password, confirmpassword, id } = req.body
+    if (password !== confirmpassword) {
+      return res.status(1001).json({
+        success: false,
+        message: 'Password does not match',
+        error: 'Password error',
+      })
+    }
+    await User1.updateUserPassword(password, id)
+      .then((data) => {
+        console.log('Data: >>>>>', data)
+        return res.status(201).json({
+          success: true,
+          message: 'Password Updated Successfully...',
+          error: 'no error',
+        })
+      })
+      .catch((error) => {
+        console.log('Error: >>>>>', error.message)
+        return res.status(200).json({
+          success: false,
+          message: error.message,
+          error: error.message,
+        })
+      })
+  } catch (error) {
+    console.error('Error fetching user:', error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
+
+exports.recoverPassword = async (req, res) => {
+  console.log('recoverPassword')
+  const { email } = req.body
+  const user = await User1.getUserByEmail(email)
+  if (user === undefined) {
+    console.log('!user')
+    return res.status(401).json({
+      message: 'Invalid Email or Password',
+    })
+  }
+  const code = generateCode()
+  const resetExists = await User1.getResetByEmail(email)
+  const html = `<p>You are receiving this because you (or someone else) have requested the reset of the password for your account.
+  \n\n Your verification status is ${code}:\n\n
+  \n\n If you did not request this, please ignore this email and your password will remain unchanged.           
+  </p>`
+  await generateEmail(email, 'Friendly Forces - Password Reset', html)
+
+  if (resetExists === undefined) {
+    await User1.createReset(code, email)
+      .then((data) => {
+        console.log('Data: >>>>>', data)
+        return res.status(200).json({
+          success: true,
+
+          message:
+            'Recovery status Has Been Emailed To Your Registered Email Address',
+          error: 'no error',
+        })
+      })
+      .catch((error) => {
+        console.log('Error: >>>>>', error.message)
+        return res.status(200).json({
+          success: false,
+          message: error.message,
+          error: error.message,
+        })
+      })
+  } else {
+    await User1.updateReset(code, email)
+      .then((data) => {
+        console.log('Data: >>>>>', data)
+        return res.status(200).json({
+          success: true,
+
+          message:
+            'Recovery status Has Been Emailed To Your Registered Email Address',
+          error: 'no error',
+        })
+      })
+      .catch((error) => {
+        console.log('Error: >>>>>', error.message)
+        return res.status(200).json({
+          success: false,
+          message: error.message,
+          error: error.message,
+        })
+      })
+  }
+}
+
+exports.verifyResetCode = async (req, res) => {
+  const { code, email } = req.body
+  const codeverify = await User1.verifyCode(code, email)
+
+  if (codeverify === undefined)
+    return res.status(200).json({ message: 'Recovery status Accepted' })
+  else {
+    return res.status(400).json({ message: 'Invalid Code' })
+  }
+}
+
+exports.updatepassword = async (req, res) => {
+  try {
+    const { password, confirmpassword, email } = req.body
+    if (password !== confirmpassword) {
+      return res.status(1001).json({
+        success: false,
+        message: 'Password does not match',
+        error: 'Password error',
+      })
+    }
+    await User1.resetUserPassword(password, email)
+      .then((data) => {
+        console.log('Data: >>>>>', data)
+        return res.status(201).json({
+          success: true,
+          message: 'Password Updated Successfully...',
+          error: 'no error',
+        })
+      })
+      .catch((error) => {
+        console.log('Error: >>>>>', error.message)
+        return res.status(200).json({
+          success: false,
+          message: error.message,
+          error: error.message,
+        })
+      })
   } catch (error) {
     console.error('Error fetching user:', error)
     res.status(500).json({ error: 'Internal Server Error' })

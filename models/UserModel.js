@@ -41,10 +41,85 @@ const registerCompanyPortalUser = async (
   return result
 }
 
+const editUserbyID = async (
+  email,
+  phone,
+  location,
+  gender,
+  language,
+  dob,
+  id
+) => {
+  const sql =
+    'UPDATE user SET email = ?, phone = ?, location = ?, gender = ?, language = ?, dob = ? WHERE id = ?'
+
+  const result = await query(sql, [
+    email,
+    phone,
+    location,
+    gender,
+    language,
+    dob,
+    id,
+  ])
+  console.log('result')
+  return result[0]
+}
+
+const updateUserPassword = async (password, id) => {
+  const sql = 'UPDATE user SET password = ? WHERE id = ?'
+
+  const result = await query(sql, [password, id])
+  console.log('result')
+  return result[0]
+}
+
+const createReset = async (code, email) => {
+  const sql = `INSERT INTO resetpassword (code,email) VALUES (?, ?)`
+
+  const result = await query(sql, [code, email])
+  console.log('result')
+  return result[0]
+}
+
+const updateReset = async (code, email) => {
+  const sql = 'UPDATE resetpassword SET code = ? WHERE email = ?'
+
+  const result = await query(sql, [code, email])
+  console.log('result')
+  return result[0]
+}
+const getResetByEmail = async (email) => {
+  const sql = 'SELECT * FROM resetpassword WHERE email = ?'
+  const result = await query(sql, [email])
+  console.log('result')
+  return result[0]
+}
+
+const verifyCode = async (email, code) => {
+  const sql = 'SELECT * FROM resetpassword WHERE email = ? AND code = ?'
+  const result = await query(sql, [email, code])
+  console.log('result')
+  return result[0]
+}
+const resetUserPassword = async (password, email) => {
+  const sql = 'UPDATE user SET password = ? WHERE email = ?'
+
+  const result = await query(sql, [password, email])
+  console.log('result')
+  return result[0]
+}
 module.exports = {
   getUserById,
   getUserByEmail,
   registerAdminPortalUser,
   getPortalUserById,
   registerCompanyPortalUser,
+  editUserbyID,
+  updateUserPassword,
+  createReset,
+  updateReset,
+  getResetByEmail,
+  verifyCode,
+  resetUserPassword,
 }
