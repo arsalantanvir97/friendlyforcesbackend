@@ -245,7 +245,7 @@ exports.verifyResetCode = async (req, res) => {
   }
 }
 
-exports.updatepassword = async (req, res) => {
+exports.forgotpassword = async (req, res) => {
   try {
     const { password, confirmpassword, email } = req.body
     if (password !== confirmpassword) {
