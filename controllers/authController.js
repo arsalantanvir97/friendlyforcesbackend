@@ -115,7 +115,13 @@ exports.getUserById = async (req, res) => {
 exports.editProfie = async (req, res) => {
   try {
     const { email, phone, location, gender, language, dob, id } = req.body
-
+    if (id == '') {
+      return res.status(201).json({
+        success: false,
+        message: 'User ID missing...',
+        error: 'error',
+      })
+    }
     // const registerAdminPortalUser = await PortalUser.registerAdminPortalUser(name,email,password);
     await User1.editUserbyID(email, phone, location, gender, language, dob, id)
       .then((data) => {
@@ -143,14 +149,25 @@ exports.editProfie = async (req, res) => {
 exports.updatepassword = async (req, res) => {
   try {
     const { password, confirmpassword, id } = req.body
+    if (id == '') {
+      return res.status(201).json({
+        success: false,
+        message: 'User ID missing...',
+        error: 'error',
+      })
+    }
+
     if (password !== confirmpassword) {
-      return res.status(1001).json({
+      return res.status(403).json({
         success: false,
         message: 'Password does not match',
         error: 'Password error',
       })
     }
-    await User1.updateUserPassword(password, id)
+    const salt = await bcrypt.genSalt(10)
+    const encryptPassword = await bcrypt.hash(password, salt)
+
+    await User1.updateUserPassword(encryptPassword, id)
       .then((data) => {
         console.log('Data: >>>>>', data)
         return res.status(201).json({
@@ -236,6 +253,14 @@ exports.recoverPassword = async (req, res) => {
 
 exports.verifyResetCode = async (req, res) => {
   const { code, email } = req.body
+  if (email == '') {
+    return res.status(403).json({
+      success: false,
+      message: 'User Email missing...',
+      error: 'error',
+    })
+  }
+
   const codeverify = await User1.verifyCode(code, email)
 
   if (codeverify === undefined)
@@ -248,14 +273,25 @@ exports.verifyResetCode = async (req, res) => {
 exports.forgotpassword = async (req, res) => {
   try {
     const { password, confirmpassword, email } = req.body
+    if (email == '') {
+      return res.status(403).json({
+        success: false,
+        message: 'User Email missing...',
+        error: 'error',
+      })
+    }
+
     if (password !== confirmpassword) {
-      return res.status(1001).json({
+      return res.status(402).json({
         success: false,
         message: 'Password does not match',
         error: 'Password error',
       })
     }
-    await User1.resetUserPassword(password, email)
+    const salt = await bcrypt.genSalt(10)
+    const encryptPassword = await bcrypt.hash(password, salt)
+
+    await User1.resetUserPassword(encryptPassword, email)
       .then((data) => {
         console.log('Data: >>>>>', data)
         return res.status(201).json({
@@ -266,7 +302,7 @@ exports.forgotpassword = async (req, res) => {
       })
       .catch((error) => {
         console.log('Error: >>>>>', error.message)
-        return res.status(200).json({
+        return res.status(405).json({
           success: false,
           message: error.message,
           error: error.message,
