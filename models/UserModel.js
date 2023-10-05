@@ -40,6 +40,40 @@ const registerCompanyPortalUser = async (
   const result = await query(sql, [username, email, encryptPassword, companyId])
   return result
 }
+const registerRecruiter = async (
+  name,
+  email,
+  password,
+  usertype,
+  phone,
+  location,
+  gender,
+  language,
+  dob
+) => {
+  // const sql = `INSERT INTO employees (name, email, password) VALUES (${name}, ${email}, ${password})`;
+  const sql = `INSERT INTO user (  name,
+    email,
+    password,
+    usertype,
+    phone,
+    location,
+    gender,
+    language,
+    dob,) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  const result = await query(sql, [
+    name,
+    email,
+    password,
+    usertype,
+    phone,
+    location,
+    gender,
+    language,
+    dob,
+  ])
+  return result
+}
 
 const editUserbyID = async (
   email,
@@ -109,11 +143,34 @@ const resetUserPassword = async (password, email) => {
   console.log('result')
   return result[0]
 }
+
+const gettingAllRecruiters = async (queries) => {
+  const sql = queries
+  const result = await query(sql)
+  return result
+}
+
+const updateRecruiterStatus = async (id) => {
+  const sql = 'SELECT userstatus FROM user WHERE id = ?'
+  const result = await query(sql, [id])
+  if (result[0].userstatus == 'active') {
+    const sql = 'UPDATE user SET userstatus = inactive WHERE id = ?'
+
+    const result = await query(sql, [id])
+  } else {
+    const sql = 'UPDATE user SET userstatus = active WHERE id = ?'
+
+    const result = await query(sql, [id])
+  }
+}
+
 module.exports = {
   getUserById,
   getUserByEmail,
+  gettingAllRecruiters,
   registerAdminPortalUser,
   getPortalUserById,
+  updateRecruiterStatus,
   registerCompanyPortalUser,
   editUserbyID,
   updateUserPassword,
@@ -122,4 +179,5 @@ module.exports = {
   getResetByEmail,
   verifyCode,
   resetUserPassword,
+  registerRecruiter,
 }

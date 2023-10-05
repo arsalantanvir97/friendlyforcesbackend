@@ -9,13 +9,22 @@ const {
   recoverPassword,
   verifyResetCode,
   forgotpassword,
+  addRecruiter,
+  updateRecruiterStatusbyid,
 } = require('../controllers/authController.js')
 const { protect } = require('../middlewares/authMIddleware.js')
 
 router.post('/registerAdminPortalUser', registerAdminPortalUser)
 router.post('/authUser', authUser)
 router.get('/getUserDetails/:id', getUserById)
+router.get('/getRecruiterbyid/:id', getUserById)
+router.post('/addRecruiter', protect, addRecruiter)
+
 router.post('/editProfie', protect, editProfie)
+router.post('/editRecruiterDetails', protect, editProfie)
+
+router.get('/updateRecruiterStatusbyid/:id', protect, updateRecruiterStatusbyid)
+
 router.post('/updatepassword', updatepassword)
 router.post('/recoverPassword', recoverPassword)
 router.post('/verifyResetCode', verifyResetCode)
