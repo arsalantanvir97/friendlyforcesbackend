@@ -9,6 +9,7 @@ const {
   recoverPassword,
   verifyResetCode,
   forgotpassword,
+  getAllRecruiters,
   addRecruiter,
   updateRecruiterStatusbyid,
 } = require('../controllers/authController.js')
@@ -18,6 +19,8 @@ router.post('/registerAdminPortalUser', registerAdminPortalUser)
 router.post('/authUser', authUser)
 router.get('/getUserDetails/:id', getUserById)
 router.get('/getRecruiterbyid/:id', getUserById)
+router.get('/getAllRecruiters', getAllRecruiters)
+
 router.post('/addRecruiter', protect, addRecruiter)
 
 router.post('/editProfie', protect, editProfie)
