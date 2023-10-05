@@ -166,6 +166,18 @@ exports.getUserById = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' })
   }
 }
+exports.getRecruiterbyid = async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const user = await User1.getPortalRecruiterById(id)
+    res.json(user)
+  } catch (error) {
+    console.error('Error fetching user:', error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
+
 exports.updateRecruiterStatusbyid = async (req, res) => {
   try {
     const { id } = req.params
@@ -182,7 +194,7 @@ exports.editProfie = async (req, res) => {
   try {
     const { email, phone, location, gender, language, dob, id } = req.body
     if (id == '') {
-      return res.status(201).json({
+      return res.status(400).json({
         success: false,
         message: 'User ID missing...',
         error: 'error',
@@ -200,7 +212,7 @@ exports.editProfie = async (req, res) => {
       })
       .catch((error) => {
         console.log('Error: >>>>>', error.message)
-        return res.status(200).json({
+        return res.status(400).json({
           success: false,
           message: error.message,
           error: error.message,
@@ -457,7 +469,7 @@ exports.getAllRecruiters = async (req, res) => {
       }
 
       // Add sorting by date_column in descending order
-      query += ' ORDER BY created_at DESC'
+      query += ' ORDER BY name ASC'
 
       // Count the total number of records
       const countQuery = query.replace('SELECT *', 'SELECT COUNT(*) as count')

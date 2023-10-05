@@ -12,13 +12,14 @@ const {
   getAllRecruiters,
   addRecruiter,
   updateRecruiterStatusbyid,
+  getRecruiterbyid,
 } = require('../controllers/authController.js')
 const { protect } = require('../middlewares/authMIddleware.js')
 
 router.post('/registerAdminPortalUser', registerAdminPortalUser)
 router.post('/authUser', authUser)
 router.get('/getUserDetails/:id', getUserById)
-router.get('/getRecruiterbyid/:id', getUserById)
+router.get('/getRecruiterbyid/:id', getRecruiterbyid)
 router.get('/getAllRecruiters', getAllRecruiters)
 
 router.post('/addRecruiter', protect, addRecruiter)

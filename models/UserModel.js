@@ -1,4 +1,5 @@
 const query = require('../config/db')
+const bcrypt = require('bcryptjs')
 
 // const getUserById = async (userId) => {
 const getUserById = async () => {
@@ -26,6 +27,14 @@ const registerAdminPortalUser = async (name, email, password, usertype) => {
 const getPortalUserById = async (id) => {
   const sql = 'SELECT * FROM user WHERE id = ?'
   const result = await query(sql, [id])
+  return result
+}
+const getPortalRecruiterById = async (id) => {
+  const sql = 'SELECT * FROM user WHERE id = ?'
+  const result = await query(sql, [id])
+  const originalPassword = await bcrypt.hashSync(hashedPassword, 10)
+  result[0].password = originalPassword
+
   return result
 }
 
@@ -60,7 +69,7 @@ const registerRecruiter = async (
     location,
     gender,
     language,
-    dob,) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    dob) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   const result = await query(sql, [
     name,
     email,
@@ -149,21 +158,21 @@ const gettingAllRecruiters = async (queries) => {
   const result = await query(sql)
   return result
 }
-
 const updateRecruiterStatus = async (id) => {
   const sql = 'SELECT userstatus FROM user WHERE id = ?'
   const result = await query(sql, [id])
   if (result[0].userstatus == 'active') {
-    const sql = 'UPDATE user SET userstatus = inactive WHERE id = ?'
+    const sql = `UPDATE user SET userstatus = 'inactive' WHERE id = ?`
 
     const result = await query(sql, [id])
+    return result
   } else {
-    const sql = 'UPDATE user SET userstatus = active WHERE id = ?'
+    const sql = `UPDATE user SET userstatus = 'active' WHERE id = ?`
 
     const result = await query(sql, [id])
+    return result
   }
 }
-
 module.exports = {
   getUserById,
   getUserByEmail,
@@ -180,4 +189,5 @@ module.exports = {
   verifyCode,
   resetUserPassword,
   registerRecruiter,
+  getPortalRecruiterById,
 }
